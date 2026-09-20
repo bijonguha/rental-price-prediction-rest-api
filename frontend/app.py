@@ -1,9 +1,11 @@
+import os
 import streamlit as st
 import pandas as pd
 import requests
 
-# Base URL of the Flask backend
-BACKEND_URL = "http://backend:7860"
+# Base URL of the Flask backend. In Docker Compose, allow the host gateway override
+# when direct service-name connectivity is not reliable in this environment.
+BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:7860")
 
 # Set the title of the Streamlit app
 st.title("Airbnb Rental Price Prediction")

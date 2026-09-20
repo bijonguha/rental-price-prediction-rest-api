@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -8,6 +6,12 @@ services:
     container_name: backend
     ports:
       - "7860:7860"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7860/').read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - churn-app-network
 
@@ -16,10 +20,15 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
+    environment:
+      BACKEND_URL: "http://host.docker.internal:7860"
     ports:
       - "8501:8501"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - churn-app-network
 
